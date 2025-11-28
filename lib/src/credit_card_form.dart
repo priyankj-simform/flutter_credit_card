@@ -391,7 +391,8 @@ class CreditCardFormState extends State<CreditCardForm> {
       onCreditCardModelChange(creditCardModel);
     });
 
-    // Reset the form validation state
+    // Reset the form validation state after setState() completes
+    // This ensures the form validation is reset based on the current (empty) state
     widget.formKey.currentState?.reset();
   }
 
