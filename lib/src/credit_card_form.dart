@@ -141,10 +141,14 @@ class CreditCardForm extends StatefulWidget {
   final bool isCardHolderNameUpperCase;
 
   @override
-  State<CreditCardForm> createState() => _CreditCardFormState();
+  CreditCardFormState createState() => CreditCardFormState();
 }
 
-class _CreditCardFormState extends State<CreditCardForm> {
+/// State class for [CreditCardForm].
+///
+/// Use [GlobalKey<CreditCardFormState>] to access the state from outside and
+/// call [clearForm] to programmatically clear all form fields.
+class CreditCardFormState extends State<CreditCardForm> {
   late String cardNumber;
   late String expiryDate;
   late String cardHolderName;
@@ -345,6 +349,50 @@ class _CreditCardFormState extends State<CreditCardForm> {
       cvvCode,
       isCvvFocused,
     );
+  }
+
+  /// Clears all form fields and resets the form validation state.
+  ///
+  /// This method can be accessed via a [GlobalKey<CreditCardFormState>]:
+  /// ```dart
+  /// final GlobalKey<CreditCardFormState> formKey =
+  ///     GlobalKey<CreditCardFormState>();
+  ///
+  /// // Later, to clear the form:
+  /// formKey.currentState?.clearForm();
+  /// ```
+  ///
+  /// This will:
+  /// - Clear all text controllers (card number, expiry date, CVV, card holder)
+  /// - Reset the form validation state
+  /// - Notify the parent via [CreditCardForm.onCreditCardModelChange] callback
+  ///   with empty values
+  void clearForm() {
+    setState(() {
+      // Clear all text controllers
+      _cardNumberController.clear();
+      _expiryDateController.clear();
+      _cardHolderNameController.clear();
+      _cvvCodeController.clear();
+
+      // Reset local state variables
+      cardNumber = '';
+      expiryDate = '';
+      cardHolderName = '';
+      cvvCode = '';
+
+      // Update the credit card model with empty values
+      creditCardModel.cardNumber = '';
+      creditCardModel.expiryDate = '';
+      creditCardModel.cardHolderName = '';
+      creditCardModel.cvvCode = '';
+
+      // Notify parent with the updated model
+      onCreditCardModelChange(creditCardModel);
+    });
+
+    // Reset the form validation state
+    widget.formKey.currentState?.reset();
   }
 
   void _onCardNumberChange(String value) {
