@@ -29,6 +29,8 @@ class MySampleState extends State<MySample> {
     ),
   );
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final GlobalKey<CreditCardFormState> creditCardFormKey =
+      GlobalKey<CreditCardFormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -146,6 +148,7 @@ class MySampleState extends State<MySample> {
                         child: Column(
                           children: <Widget>[
                             CreditCardForm(
+                              key: creditCardFormKey,
                               formKey: formKey,
                               obscureCvv: true,
                               obscureNumber: true,
@@ -237,44 +240,85 @@ class MySampleState extends State<MySample> {
                               ),
                             ),
                             const SizedBox(height: 20),
-                            GestureDetector(
-                              onTap: _onValidate,
-                              child: Container(
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
-                                ),
-                                decoration: const BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: <Color>[
-                                      AppColors.colorB58D67,
-                                      AppColors.colorB58D67,
-                                      AppColors.colorE5D1B2,
-                                      AppColors.colorF9EED2,
-                                      AppColors.colorEFEFED,
-                                      AppColors.colorF9EED2,
-                                      AppColors.colorB58D67,
-                                    ],
-                                    begin: Alignment(-1, -4),
-                                    end: Alignment(1, 4),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: _onValidate,
+                                    child: Container(
+                                      margin: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 8,
+                                      ),
+                                      decoration: const BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: <Color>[
+                                            AppColors.colorB58D67,
+                                            AppColors.colorB58D67,
+                                            AppColors.colorE5D1B2,
+                                            AppColors.colorF9EED2,
+                                            AppColors.colorEFEFED,
+                                            AppColors.colorF9EED2,
+                                            AppColors.colorB58D67,
+                                          ],
+                                          begin: Alignment(-1, -4),
+                                          end: Alignment(1, 4),
+                                        ),
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(8),
+                                        ),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 15,
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: const Text(
+                                        'Validate',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontFamily: 'halter',
+                                          fontSize: 14,
+                                          package: 'flutter_credit_card',
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(8),
+                                ),
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: _onClearForm,
+                                    child: Container(
+                                      margin: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 8,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: AppColors.colorB58D67,
+                                          width: 2,
+                                        ),
+                                        borderRadius: const BorderRadius.all(
+                                          Radius.circular(8),
+                                        ),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 15,
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: const Text(
+                                        'Clear',
+                                        style: TextStyle(
+                                          color: AppColors.colorB58D67,
+                                          fontFamily: 'halter',
+                                          fontSize: 14,
+                                          package: 'flutter_credit_card',
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 15),
-                                alignment: Alignment.center,
-                                child: const Text(
-                                  'Validate',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: 'halter',
-                                    fontSize: 14,
-                                    package: 'flutter_credit_card',
-                                  ),
-                                ),
-                              ),
+                              ],
                             ),
                           ],
                         ),
@@ -298,6 +342,11 @@ class MySampleState extends State<MySample> {
     }
   }
 
+  void _onClearForm() {
+    creditCardFormKey.currentState?.clearForm();
+
+
+
   Glassmorphism? _getGlassmorphismConfig() {
     if (!useGlassMorphism) {
       return null;
@@ -316,12 +365,11 @@ class MySampleState extends State<MySample> {
   }
 
   void onCreditCardModelChange(CreditCardModel creditCardModel) {
-    setState(() {
-      cardNumber = creditCardModel.cardNumber;
-      expiryDate = creditCardModel.expiryDate;
-      cardHolderName = creditCardModel.cardHolderName;
-      cvvCode = creditCardModel.cvvCode;
-      isCvvFocused = creditCardModel.isCvvFocused;
-    });
+    cardNumber = creditCardModel.cardNumber;
+    expiryDate = creditCardModel.expiryDate;
+    cardHolderName = creditCardModel.cardHolderName;
+    cvvCode = creditCardModel.cvvCode;
+    isCvvFocused = creditCardModel.isCvvFocused;
+    setState(() {});
   }
 }
