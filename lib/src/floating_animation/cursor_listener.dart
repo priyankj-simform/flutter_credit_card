@@ -8,8 +8,21 @@ import '../utils/constants.dart';
 import '../utils/enumerations.dart';
 import 'floating_event.dart';
 
+/// A widget that listens to mouse cursor movement and generates floating events.
+///
+/// This widget detects mouse hover events over the credit card area and
+/// converts cursor position into [FloatingEvent]s, which are then used
+/// to create a floating/tilting animation effect on the card.
+///
+/// The widget implements smooth entry and exit animations by gradually
+/// adjusting the intensity factor when the cursor enters or leaves the area.
+///
+/// This is an internal widget used by [CreditCardWidget] for web/desktop
+/// platforms where gyroscope data is not available.
 class CursorListener extends StatefulWidget {
-  /// This widget listens cursor entry and exit while hovering on the card
+  /// Creates a cursor listener widget.
+  ///
+  /// All parameters are required.
   const CursorListener({
     required this.onPositionChange,
     required this.height,
@@ -18,17 +31,22 @@ class CursorListener extends StatefulWidget {
     super.key,
   });
 
-  /// Any padding applied to the area where the cursor movement is to be
-  /// detected.
+  /// The padding applied around the detection area.
+  ///
+  /// Used to calculate clamping bounds when the card widget is larger
+  /// than the breakpoint.
   final double padding;
 
-  /// The height of the area where the cursor movement is to be detected.
+  /// The height of the area where cursor movement is detected.
   final double height;
 
-  /// The width of the area where the cursor movement is to be detected.
+  /// The width of the area where cursor movement is detected.
   final double width;
 
-  ///This called when a pointer event is received.
+  /// Callback invoked when a cursor position change is detected.
+  ///
+  /// The callback receives a [FloatingEvent] containing the calculated
+  /// x and y rotation values based on cursor position.
   final ValueChanged<FloatingEvent> onPositionChange;
 
   @override
@@ -36,19 +54,24 @@ class CursorListener extends StatefulWidget {
 }
 
 class _CursorListenerState extends State<CursorListener> {
-  /// A value used for deltas and throttling
+  /// The last recorded cursor offset, used for calculating deltas
+  /// and throttling events.
   Offset lastOffset = Offset.zero;
 
-  /// A value used for deltas and throttling
+  /// The timestamp of the last processed pointer event, used for throttling.
   DateTime lastPointerEvent = DateTime.now();
 
-  /// When idle, the intensity factor is 0. When the pointer enters, it
-  /// progressively animates to 1.
+  /// The current intensity factor for smooth animation transitions.
+  ///
+  /// Animates from 0 (idle) to 1 (fully active) when cursor enters,
+  /// and back to 0 when cursor exits.
   double intensityFactor = 0;
 
-  /// A timer that progressively increases or decreases the intensity factor.
+  /// Timer that handles progressive intensity factor changes for smooth
+  /// entry and exit animations.
   Timer? velocityTimer;
 
+  /// Cached value of padding * 2 for performance.
   late double surroundedPadding = widget.padding * 2;
 
   @override

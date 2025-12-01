@@ -3,6 +3,17 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import '../floating_animation/floating_event.dart';
 import 'flutter_credit_card_method_channel.dart';
 
+/// The platform interface for the flutter_credit_card plugin.
+///
+/// This abstract class defines the interface for platform-specific
+/// implementations of the gyroscope functionality used for the floating
+/// card animation.
+///
+/// Platform implementations should extend this class and register themselves
+/// as the [instance] to provide platform-specific gyroscope access.
+///
+/// The default implementation is [MethodChannelFlutterCreditCard], which
+/// uses method channels to communicate with native platform code.
 abstract class FlutterCreditCardPlatform extends PlatformInterface {
   /// Constructs a FlutterCreditCardPlatform.
   FlutterCreditCardPlatform() : super(token: _token);
@@ -11,34 +22,52 @@ abstract class FlutterCreditCardPlatform extends PlatformInterface {
 
   static FlutterCreditCardPlatform _instance = MethodChannelFlutterCreditCard();
 
-  /// The default instance of [FlutterCreditCardPlatform] to use.
+  /// The current platform-specific implementation.
   ///
   /// Defaults to [MethodChannelFlutterCreditCard].
   static FlutterCreditCardPlatform get instance => _instance;
 
-  /// Platform-specific implementations should set this with their own
-  /// platform-specific class that extends [FlutterCreditCardPlatform] when
-  /// they register themselves.
+  /// Sets the platform-specific implementation.
+  ///
+  /// Platform plugins should call this in their `registerWith` method
+  /// to provide their custom implementation.
   static set instance(FlutterCreditCardPlatform instance) {
     PlatformInterface.verifyToken(instance, _token);
     _instance = instance;
   }
 
-  /// Denotes gyroscope feature availability.
+  /// Whether gyroscope sensor data is available on this device.
+  ///
+  /// Returns `false` by default. Platform implementations should override
+  /// this to indicate actual gyroscope availability.
   bool get isGyroscopeAvailable => false;
 
-  /// The stream having gyroscope data events, if available.
+  /// A stream of [FloatingEvent]s from the gyroscope sensor.
+  ///
+  /// Returns `null` if gyroscope is not available. When available, the stream
+  /// emits rotation rate data that can be used for the floating animation.
   Stream<FloatingEvent>? get floatingStream => null;
 
-  /// Initializes the method and event channels.
+  /// Initializes the platform plugin and checks for gyroscope availability.
+  ///
+  /// Must be called before accessing [isGyroscopeAvailable] or [floatingStream].
+  /// Sets up method and event channels for native communication.
   Future<void> initialize() async => throw UnimplementedError();
 
-  /// Initiates the gyroscope data events.
+  /// Starts receiving gyroscope data events.
+  ///
+  /// Called internally after [initialize] determines that gyroscope is
+  /// available.
   Future<void> initiateEvents() async => throw UnimplementedError();
 
-  /// Cancels the gyroscope data events.
+  /// Stops receiving gyroscope data events.
+  ///
+  /// Cancels the event stream to stop receiving sensor updates.
   Future<void> cancelEvents() async => throw UnimplementedError();
 
-  /// Disposes the method and event channels.
+  /// Disposes of platform resources.
+  ///
+  /// Cancels event streams and cleans up native resources. Should be called
+  /// when the credit card widget is disposed.
   Future<void> dispose() async => throw UnimplementedError();
 }

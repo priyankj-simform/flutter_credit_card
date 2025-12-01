@@ -5,38 +5,67 @@ import 'package:flutter/rendering.dart';
 import '../utils/constants.dart';
 import 'floating_event.dart';
 
+/// Controller for managing floating card animation transformations.
+///
+/// This controller maintains the current x and y rotation angles and
+/// provides the transformation logic for the floating effect. It handles
+/// both gyroscope-based (mobile) and pointer-based (web/desktop) inputs.
+///
+/// The controller converts [FloatingEvent] data into [Matrix4]
+/// transformations that can be applied to the credit card widget.
 class FloatingController {
-  /// Houses [x] and [y] angles, and the transformation logic for the
-  /// floating effect.
+  /// Creates a floating controller with custom configuration.
+  ///
+  /// The [maximumAngle] limits how far the card can tilt.
+  /// The [restBackVelocity] controls how quickly the card returns to
+  /// its neutral position.
   FloatingController({
     required this.maximumAngle,
     this.restBackVelocity,
     this.isGyroscopeAvailable = false,
   });
 
+  /// Creates a floating controller with predefined default values.
+  ///
+  /// Uses [AppConstants.defaultRestBackVel] for rest back velocity
+  /// and [AppConstants.defaultMaximumAngle] for maximum angle.
   FloatingController.predefined()
       : restBackVelocity = AppConstants.defaultRestBackVel,
         maximumAngle = AppConstants.defaultMaximumAngle,
         isGyroscopeAvailable = false;
 
+  /// Whether gyroscope data is available on the current device.
+  ///
+  /// When true, the controller processes gyroscope events for relative motion.
+  /// When false, it processes pointer events for absolute positioning.
   bool isGyroscopeAvailable;
 
-  /// The maximum floating animation moving angle.
+  /// The maximum angle (in radians) the card can tilt in any direction.
+  ///
+  /// This limits the rotation to prevent extreme tilting that could
+  /// distort the card appearance.
   double maximumAngle;
 
-  /// Represents the x value for gyroscope and mouse pointer data.
+  /// The current X rotation angle in radians.
+  ///
+  /// Positive values tilt the card top away from the viewer.
   double x = 0;
 
-  /// Represents the y value for gyroscope and mouse pointer data.
+  /// The current Y rotation angle in radians.
+  ///
+  /// Positive values tilt the card right side toward the viewer.
   double y = 0;
 
-  /// Determines the velocity when the card rests back to default position.
+  /// The velocity at which the card returns to its neutral position.
+  ///
+  /// Values should be between 0 and 1. Higher values make the card
+  /// return more quickly to its resting position.
   double? restBackVelocity;
 
-  /// The actual resting back factor used by the widget.
+  /// The computed rest-back factor used for gradual return animation.
   ///
-  /// Computed from the [restBackVelocity] value which lerps from 0 to 1 between
-  /// [minRestBackVel] and [maxRestBackVel].
+  /// Calculated from [restBackVelocity] and used internally to lerp
+  /// the card back to its neutral position.
   double get restBackFactor {
     if (restBackVelocity == null) {
       return 1;
@@ -49,15 +78,27 @@ class FloatingController {
     }
   }
 
-  /// Restricts [x] and [y] values to extend within the limit of the
-  /// [maximumAngle] only.
+  /// Clamps the [x] and [y] rotation values to stay within [maximumAngle].
+  ///
+  /// This prevents the card from tilting beyond the configured limits,
+  /// ensuring the visual effect remains pleasant and the card stays readable.
   void boundAngle() {
     x = min(maximumAngle / 2, max(-maximumAngle / 2, x));
     y = min(maximumAngle / 2, max(-maximumAngle / 2, y));
   }
 
-  /// Transforms the [x] and [y] angles by performing operations on the angles
-  /// received from the [event].
+  /// Transforms the rotation angles based on a [FloatingEvent] and returns
+  /// a transformation matrix.
+  ///
+  /// The returned [Matrix4] includes perspective, rotation, and translation
+  /// components that create the floating effect.
+  ///
+  /// If [shouldAvoid] is true or [event] is null, returns an identity matrix
+  /// with only perspective applied (no rotation or translation).
+  ///
+  /// The transformation differs based on input type:
+  /// - Gyroscope: Applies incremental rotation with rest-back factor
+  /// - Pointer: Applies absolute positioning based on cursor location
   Matrix4 transform(
     FloatingEvent? event, {
     /// Denotes whether to avoid applying any transformation.

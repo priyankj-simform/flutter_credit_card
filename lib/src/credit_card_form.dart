@@ -8,7 +8,65 @@ import 'utils/helpers.dart';
 import 'utils/typedefs.dart';
 import 'utils/validators.dart';
 
+/// A form widget for capturing credit card details.
+///
+/// This widget provides text fields for entering card number, expiry date,
+/// CVV code, and card holder name. It includes built-in validation and
+/// formatting, and notifies listeners of changes via [onCreditCardModelChange].
+///
+/// The form automatically formats input (e.g., adding spaces to card numbers,
+/// formatting expiry dates) and validates entries based on standard credit
+/// card rules.
+///
+/// ## Basic Usage
+///
+/// ```dart
+/// CreditCardForm(
+///   formKey: _formKey,
+///   cardNumber: cardNumber,
+///   expiryDate: expiryDate,
+///   cardHolderName: cardHolderName,
+///   cvvCode: cvvCode,
+///   onCreditCardModelChange: (CreditCardModel model) {
+///     setState(() {
+///       cardNumber = model.cardNumber;
+///       expiryDate = model.expiryDate;
+///       cardHolderName = model.cardHolderName;
+///       cvvCode = model.cvvCode;
+///       isCvvFocused = model.isCvvFocused;
+///     });
+///   },
+/// )
+/// ```
+///
+/// ## With Custom Decorations
+///
+/// ```dart
+/// CreditCardForm(
+///   formKey: _formKey,
+///   cardNumber: cardNumber,
+///   expiryDate: expiryDate,
+///   cardHolderName: cardHolderName,
+///   cvvCode: cvvCode,
+///   onCreditCardModelChange: onModelChange,
+///   inputConfiguration: InputConfiguration(
+///     cardNumberDecoration: InputDecoration(
+///       border: OutlineInputBorder(),
+///       labelText: 'Card Number',
+///     ),
+///   ),
+/// )
+/// ```
+///
+/// See also:
+/// - [CreditCardWidget] for displaying the credit card UI.
+/// - [CreditCardModel] for the data model used by this form.
+/// - [InputConfiguration] for customizing input field appearance.
 class CreditCardForm extends StatefulWidget {
+  /// Creates a credit card form.
+  ///
+  /// The [cardNumber], [expiryDate], [cardHolderName], [cvvCode],
+  /// [onCreditCardModelChange], and [formKey] parameters are required.
   const CreditCardForm({
     required this.cardNumber,
     required this.expiryDate,
