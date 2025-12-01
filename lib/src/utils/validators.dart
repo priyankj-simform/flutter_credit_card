@@ -19,7 +19,7 @@ class Validators {
   /// Note: This is a basic length check and does not perform Luhn algorithm
   /// validation.
   static String? cardNumberValidator(String? value, String errorMsg) {
-    // Validate less that 13 digits +3 white spaces
+    // Validate less than 13 digits + 3 white spaces
     return (value?.isEmpty ?? true) || (value?.length ?? 16) < 16
         ? errorMsg
         : null;
