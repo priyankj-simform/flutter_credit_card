@@ -344,7 +344,8 @@ class MySampleState extends State<MySample> {
 
   void _onClearForm() {
     creditCardFormKey.currentState?.clearForm();
-  }
+
+
 
   Glassmorphism? _getGlassmorphismConfig() {
     if (!useGlassMorphism) {
@@ -364,12 +365,11 @@ class MySampleState extends State<MySample> {
   }
 
   void onCreditCardModelChange(CreditCardModel creditCardModel) {
-    setState(() {
-      cardNumber = creditCardModel.cardNumber;
-      expiryDate = creditCardModel.expiryDate;
-      cardHolderName = creditCardModel.cardHolderName;
-      cvvCode = creditCardModel.cvvCode;
-      isCvvFocused = creditCardModel.isCvvFocused;
-    });
+    cardNumber = creditCardModel.cardNumber;
+    expiryDate = creditCardModel.expiryDate;
+    cardHolderName = creditCardModel.cardHolderName;
+    cvvCode = creditCardModel.cvvCode;
+    isCvvFocused = creditCardModel.isCvvFocused;
+    setState(() {});
   }
 }

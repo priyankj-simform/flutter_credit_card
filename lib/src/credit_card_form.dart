@@ -154,6 +154,7 @@ class CreditCardFormState extends State<CreditCardForm> {
   late String cardHolderName;
   late String cvvCode;
   bool isCvvFocused = false;
+  bool _isClearing = false;
 
   late final CreditCardModel creditCardModel;
   late final CCModelChangeCallback onCreditCardModelChange =
@@ -368,13 +369,16 @@ class CreditCardFormState extends State<CreditCardForm> {
   /// - Notify the parent via [CreditCardForm.onCreditCardModelChange] callback
   ///   with empty values
   void clearForm() {
-    setState(() {
-      // Clear all text controllers
-      _cardNumberController.clear();
-      _expiryDateController.clear();
-      _cardHolderNameController.clear();
-      _cvvCodeController.clear();
+    // Set flag to prevent onChange callbacks from interfering
+    _isClearing = true;
 
+    // Clear text controllers - use updateText for MaskedTextController
+    _cardNumberController.updateText('');
+    _expiryDateController.updateText('');
+    _cvvCodeController.clear();
+    _cardHolderNameController.clear();
+
+    setState(() {
       // Reset local state variables
       cardNumber = '';
       expiryDate = '';
@@ -386,17 +390,19 @@ class CreditCardFormState extends State<CreditCardForm> {
       creditCardModel.expiryDate = '';
       creditCardModel.cardHolderName = '';
       creditCardModel.cvvCode = '';
-
-      // Notify parent with the updated model
-      onCreditCardModelChange(creditCardModel);
     });
 
-    // Reset the form validation state after setState() completes
-    // This ensures the form validation is reset based on the current (empty) state
-    widget.formKey.currentState?.reset();
+    // Notify parent with the updated model AFTER setState completes
+    onCreditCardModelChange(creditCardModel);
+
+    // Reset flag after a short delay to allow all async callbacks to complete
+    Future.microtask(() {
+      _isClearing = false;
+    });
   }
 
   void _onCardNumberChange(String value) {
+    if (_isClearing) return;
     setState(() {
       creditCardModel.cardNumber = cardNumber = _cardNumberController.text;
       onCreditCardModelChange(creditCardModel);
@@ -404,6 +410,7 @@ class CreditCardFormState extends State<CreditCardForm> {
   }
 
   void _onExpiryDateChange(String value) {
+    if (_isClearing) return;
     final String expiry = _expiryDateController.text;
     _expiryDateController.text =
         expiry.startsWith(RegExp('[2-9]')) ? '0$expiry' : expiry;
@@ -414,6 +421,7 @@ class CreditCardFormState extends State<CreditCardForm> {
   }
 
   void _onCvvChange(String text) {
+    if (_isClearing) return;
     setState(() {
       creditCardModel.cvvCode = cvvCode = text;
       onCreditCardModelChange(creditCardModel);
@@ -421,6 +429,7 @@ class CreditCardFormState extends State<CreditCardForm> {
   }
 
   void _onCardHolderNameChange(String value) {
+    if (_isClearing) return;
     setState(() {
       creditCardModel.cardHolderName =
           cardHolderName = _cardHolderNameController.text;
