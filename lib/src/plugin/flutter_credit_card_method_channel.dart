@@ -7,14 +7,25 @@ import '../utils/constants.dart';
 import '../utils/enumerations.dart';
 import 'flutter_credit_card_platform_interface.dart';
 
-/// An implementation of [FlutterCreditCardPlatform] that uses method channels.
+/// Method channel implementation of [FlutterCreditCardPlatform].
+///
+/// This class provides the default platform implementation using Flutter's
+/// method channel and event channel mechanisms to communicate with native
+/// Android and iOS code for gyroscope access.
+///
+/// The gyroscope data is used to create a floating animation effect on the
+/// credit card widget, making it tilt based on device movement.
 class MethodChannelFlutterCreditCard extends FlutterCreditCardPlatform {
+  /// Event channel for receiving gyroscope data stream.
   static EventChannel? _gyroscopeEventChannel;
 
+  /// Method channel for platform communication.
   static MethodChannel? _methodChannel;
 
+  /// Cached stream of gyroscope events.
   static Stream<FloatingEvent>? _gyroscopeStream;
 
+  /// Whether gyroscope is available on this device.
   static bool _isGyroscopeAvailable = false;
 
   @override

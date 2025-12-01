@@ -21,8 +21,62 @@ import 'utils/extensions.dart';
 import 'utils/helpers.dart';
 import 'utils/typedefs.dart';
 
+/// A widget that displays a realistic credit card UI with flip animation.
+///
+/// This widget renders both the front and back sides of a credit card,
+/// displaying card details such as card number, expiry date, card holder name,
+/// and CVV code. It automatically detects and displays the card type icon
+/// (Visa, Mastercard, etc.) based on the card number.
+///
+/// The widget supports:
+/// - Flip animation to show front/back of the card
+/// - Floating animation based on device gyroscope or mouse movement
+/// - Glassmorphism visual effects
+/// - Custom backgrounds (solid color, gradient, asset image, or network image)
+/// - Custom card type icons
+///
+/// ## Basic Usage
+///
+/// ```dart
+/// CreditCardWidget(
+///   cardNumber: '4242424242424242',
+///   expiryDate: '12/25',
+///   cardHolderName: 'JOHN DOE',
+///   cvvCode: '123',
+///   showBackView: false,
+///   onCreditCardWidgetChange: (CreditCardBrand brand) {
+///     print('Card type: ${brand.brandName}');
+///   },
+/// )
+/// ```
+///
+/// ## With Floating Animation
+///
+/// ```dart
+/// CreditCardWidget(
+///   cardNumber: cardNumber,
+///   expiryDate: expiryDate,
+///   cardHolderName: cardHolderName,
+///   cvvCode: cvvCode,
+///   showBackView: false,
+///   onCreditCardWidgetChange: (brand) {},
+///   enableFloatingCard: true,
+///   floatingConfig: FloatingConfig(
+///     isGlareEnabled: true,
+///     isShadowEnabled: true,
+///   ),
+/// )
+/// ```
+///
+/// See also:
+/// - [CreditCardForm] for capturing credit card input.
+/// - [Glassmorphism] for applying glassmorphism effects.
+/// - [FloatingConfig] for configuring floating animation.
 class CreditCardWidget extends StatefulWidget {
-  /// A widget showcasing credit card UI.
+  /// Creates a credit card widget.
+  ///
+  /// The [cardNumber], [expiryDate], [cardHolderName], [cvvCode],
+  /// [showBackView], and [onCreditCardWidgetChange] parameters are required.
   const CreditCardWidget({
     required this.cardNumber,
     required this.expiryDate,
